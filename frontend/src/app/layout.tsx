@@ -31,9 +31,43 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning={true}>
         <AuthProvider>
-          <Toaster position="top-right" />
+          <Toaster 
+            position="top-center" 
+            toastOptions={{
+              duration: 4000,
+              style: {
+                padding: '16px',
+                borderRadius: '16px',
+                fontSize: '14px',
+                fontWeight: '600',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+              },
+              success: {
+                style: {
+                  background: '#F0FDF4',
+                  color: '#166534',
+                  border: '1px solid #BBF7D0',
+                },
+                iconTheme: {
+                  primary: '#22C55E',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                style: {
+                  background: '#FEF2F2',
+                  color: '#991B1B',
+                  border: '1px solid #FECACA',
+                },
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
           {children}
         </AuthProvider>
       </body>

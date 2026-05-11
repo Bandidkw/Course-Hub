@@ -1,20 +1,33 @@
-import { Router } from 'express';
+import express from 'express';
 import { 
-  getAllCourses, 
+  getCourses, 
   createCourse, 
-  updateCourse, 
-  deleteCourse 
+  updateCourse,
+  deleteCourse,
+  getCourseWithModules,
+  createModule,
+  createLesson,
+  deleteModule,
+  deleteLesson
 } from '../controllers/courseController.js';
-import { protect, adminOnly } from '../middleware/authMiddleware.js';
+import { authenticate, authorize } from '../middleware/authMiddleware.js';
 
-const router = Router();
+const router = express.Router();
 
-// Public routes
-router.get('/', getAllCourses);
+// Public / Student routes
+router.get('/', getCourses);
+router.get('/:id', getCourseWithModules);
 
-// Admin only routes
-router.post('/', protect, adminOnly, createCourse);
-router.put('/:id', protect, adminOnly, updateCourse);
-router.delete('/:id', protect, adminOnly, deleteCourse);
+// Admin routes
+router.post('/', authenticate, authorize(['ADMIN']), createCourse);
+router.put('/:id', authenticate, authorize(['ADMIN']), updateCourse);
+router.delete('/:id', authenticate, authorize(['ADMIN']), deleteCourse);
+
+// Module & Lesson management (Admin only)
+router.post('/:courseId/modules', authenticate, authorize(['ADMIN']), createModule);
+router.delete('/modules/:id', authenticate, authorize(['ADMIN']), deleteModule);
+
+router.post('/modules/:moduleId/lessons', authenticate, authorize(['ADMIN']), createLesson);
+router.delete('/lessons/:id', authenticate, authorize(['ADMIN']), deleteLesson);
 
 export default router;

@@ -21,19 +21,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const [mounted, setMounted] = React.useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (!loading && (!user || user.role !== 'ADMIN')) {
       router.push('/');
     }
   }, [user, loading, router]);
 
-  if (loading || !user || user.role !== 'ADMIN') {
+  // Prevent hydration mismatch by not rendering anything until mounted
+  if (!mounted || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-600"></div>
+          <p className="text-slate-400 text-sm font-medium animate-pulse">กำลังตรวจสอบสิทธิ์...</p>
+        </div>
       </div>
     );
+  }
+
+  // If auth is checked and user is not admin, don't render children (useEffect will handle redirect)
+  if (!user || user.role !== 'ADMIN') {
+    return null;
   }
 
   const menuItems = [

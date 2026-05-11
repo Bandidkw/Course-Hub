@@ -8,7 +8,7 @@ export interface AuthRequest extends Request {
   };
 }
 
-export const protect = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
@@ -24,10 +24,12 @@ export const protect = (req: AuthRequest, res: Response, next: NextFunction) => 
   next();
 };
 
-export const adminOnly = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user && req.user.role === 'ADMIN') {
-    next();
-  } else {
-    res.status(403).json({ message: 'Access denied, admin only' });
-  }
+export const authorize = (roles: string[]) => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (req.user && roles.includes(req.user.role)) {
+      next();
+    } else {
+      res.status(403).json({ message: 'Access denied, higher role required' });
+    }
+  };
 };
