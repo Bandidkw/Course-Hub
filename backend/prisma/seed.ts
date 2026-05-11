@@ -1,11 +1,7 @@
-import { PrismaClient } from './generated/client/index.js';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import Database from 'better-sqlite3';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-const db = new Database('./prisma/dev.db');
-const adapter = new PrismaBetterSqlite3(db);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
   const hashedPassword = await bcrypt.hash('admin1234', 10);
@@ -21,14 +17,14 @@ async function main() {
     },
   });
 
-  console.log('Seed data created:', admin);
+  console.log('Seed data created successfully (Prisma 6):', admin.email);
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Seed error:', e);
     process.exit(1);
   })
   .finally(async () => {
-    // Note: adapter-better-sqlite3 handles closing
+    await prisma.$disconnect();
   });
