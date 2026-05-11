@@ -305,6 +305,9 @@ export default function CourseModal({ isOpen, onClose, onSuccess, courseId }: Co
           background: #E2E8F0;
           border-radius: 10px;
         }
+        .custom-scrollbar {
+          scrollbar-gutter: stable;
+        }
       `}</style>
     </div>
   );

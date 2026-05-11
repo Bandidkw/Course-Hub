@@ -33,14 +33,16 @@ export default function CustomDropdown({ label, options, value, onChange, classN
   }, []);
 
   return (
-    <div className={`relative space-y-2 ${className}`} ref={dropdownRef}>
-      {label && <label className="text-xs font-black text-slate-400 uppercase tracking-wider">{label}</label>}
+    <div className={`relative ${className}`} ref={dropdownRef}>
+      {label && <label className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">{label}</label>}
       
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl transition-all outline-none
-        ${isOpen ? 'ring-2 ring-blue-500 border-transparent bg-white shadow-lg shadow-blue-50' : 'hover:bg-slate-100'}`}
+        className={`w-full h-[54px] flex items-center justify-between px-5 bg-slate-50 border rounded-2xl transition-all outline-none
+        ${isOpen 
+          ? 'border-blue-500 bg-white shadow-[0_0_0_1px_rgba(59,130,246,1)] shadow-blue-50' 
+          : 'border-slate-100 hover:bg-slate-100'}`}
       >
         <span className="font-bold text-slate-700">{selectedOption?.label}</span>
         <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-500' : ''}`} />
