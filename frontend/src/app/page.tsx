@@ -20,8 +20,13 @@ import AuthModal from '@/components/AuthModal';
 
 export default function HomePage() {
   const { user, logout } = useAuth();
+  const [mounted, setMounted] = React.useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
   const [authMode, setAuthMode] = React.useState<'login' | 'register'>('login');
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const openLogin = () => {
     setAuthMode('login');
@@ -85,17 +90,29 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              {user ? (
+              {!mounted ? (
+                <div className="w-20 h-8 bg-gray-100 animate-pulse rounded-full"></div>
+              ) : user ? (
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2 text-gray-700">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                      <User className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">
+                      {user.name.charAt(0)}
                     </div>
                     <span className="font-medium hidden sm:inline">{user.name}</span>
                   </div>
+                  
+                  {user.role === 'ADMIN' && (
+                    <Link 
+                      href="/admin/dashboard" 
+                      className="text-sm font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 transition-all cursor-pointer"
+                    >
+                      จัดการระบบ
+                    </Link>
+                  )}
+
                   <button 
                     onClick={logout}
-                    className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                    className="p-2 text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
                     title="ออกจากระบบ"
                   >
                     <LogOut className="w-5 h-5" />
@@ -105,13 +122,13 @@ export default function HomePage() {
                 <div className="flex items-center space-x-3">
                   <button 
                     onClick={openLogin}
-                    className="text-gray-600 hover:text-blue-600 font-medium px-4 py-2 transition-colors"
+                    className="text-gray-600 hover:text-blue-600 font-medium px-4 py-2 transition-colors cursor-pointer"
                   >
                     เข้าสู่ระบบ
                   </button>
                   <button 
                     onClick={openRegister}
-                    className="bg-blue-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
+                    className="bg-blue-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all cursor-pointer"
                   >
                     สมัครเรียนฟรี
                   </button>
@@ -236,7 +253,7 @@ export default function HomePage() {
                       <p className="text-2xl font-extrabold text-blue-600">
                         ฿{course.price.toLocaleString()}
                       </p>
-                      <button className="p-2 bg-gray-50 text-gray-400 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-all">
+                      <button className="p-2 bg-gray-50 text-gray-400 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-all cursor-pointer">
                         <ArrowRight className="w-5 h-5" />
                       </button>
                     </div>

@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { 
   LogIn, 
   UserPlus, 
@@ -10,7 +12,9 @@ import {
   Lock, 
   User, 
   Loader2, 
-  X 
+  X,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface AuthModalProps {
@@ -21,12 +25,14 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  const { login } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
 
   if (!isOpen) return null;
 
@@ -41,9 +47,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
       
       const response = await api.post(endpoint, payload);
       login(response.data.token, response.data.user);
+      
+      toast.success(mode === 'login' ? 'เข้าสู่ระบบสำเร็จ!' : 'สมัครสมาชิกสำเร็จ!');
+      
+      if (response.data.user.role === 'ADMIN') {
+        router.push('/admin/dashboard');
+      }
+      
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+      const message = err.response?.data?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -61,7 +76,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
       <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
         >
           <X className="w-6 h-6" />
         </button>
@@ -121,19 +136,26 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                 <Lock className="w-5 h-5" />
               </div>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 placeholder="รหัสผ่าน"
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-4 rounded-2xl font-bold text-lg text-white shadow-lg transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 ${
+              className={`w-full py-4 rounded-2xl font-bold text-lg text-white shadow-lg transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 cursor-pointer ${
                 mode === 'login' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-200' : 'bg-green-600 hover:bg-green-700 shadow-green-200'
               }`}
             >
@@ -150,7 +172,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
               {mode === 'login' ? 'ยังไม่มีบัญชี?' : 'มีบัญชีอยู่แล้ว?'}
               <button
                 onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-                className="ml-2 font-bold text-blue-600 hover:underline"
+                className="ml-2 font-bold text-blue-600 hover:underline cursor-pointer"
               >
                 {mode === 'login' ? 'สมัครสมาชิกฟรี' : 'เข้าสู่ระบบ'}
               </button>
